@@ -9,7 +9,7 @@ function cd() {
   fi
   while [[ $rpath != / ]];
   do
-    apath=$rpath"/.aliases"
+    apath=$rpath"/.path-alias"
     if [ -e $apath ]; then
       source $apath
       return
