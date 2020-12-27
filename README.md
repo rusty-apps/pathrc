@@ -19,7 +19,7 @@ $ source $HOME/repos/path-alias/path-alias.sh
 
 ## EXAMPLE
 
-.aliases
+.path-alias
 
 alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"
 
