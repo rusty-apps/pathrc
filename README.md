@@ -1,4 +1,4 @@
-# path-rc (formally path-alias)
+# path-rc
 
 Shell environment variables, aliases and functions determined by path
 
