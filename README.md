@@ -22,13 +22,11 @@ $ source $HOME/repos/path-rc/path-rc.sh
 
 .path-rc
 
-alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"
+alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"<br/>
 export TF_WORKSPACE=dev-kubernetes-cluster
 
 ## Inspiration
 
-ASDF: 
-https://github.com/asdf-vm/asdf
+ASDF: https://github.com/asdf-vm/asdf
 
-Stack Exchange:
-https://unix.stackexchange.com/questions/6463/find-searching-in-parent-directories-instead-of-subdirectories
+Stack Exchange: https://unix.stackexchange.com/questions/6463/find-searching-in-parent-directories-instead-of-subdirectories
