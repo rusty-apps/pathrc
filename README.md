@@ -22,7 +22,7 @@ $ source $HOME/repos/path-rc/path-rc.sh
 
 .path-rc
 
-alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"<br/>
+alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'<br/>
 export TF_WORKSPACE=dev-kubernetes-cluster
 
 ## Inspiration
