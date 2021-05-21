@@ -8,11 +8,14 @@ NOTE: to build the findrc binary you will need rust installed: [Rust Getting Sta
 
 ## Usage
 
-1) Clone the repository onto your local system
+**Clone the repository onto your local system**
 ```shell
 $ git clone https://github.com/tpreecesh/path-rc.git
 ```
-2) Build the binary:
+**Enable findrc**
+
+OPTION 1 Build the binary
+1) Build the binary:
 ```shell
 cd findrc
 cargo build --release
@@ -21,18 +24,37 @@ cargo build --release
 ```shell
 cp target/release/findrc /usr/local/bin
 ```
-2) Source the path-rc.sh from your shell's rc file
+OPTION 2 Use the scripted version
+1) Uncomment the findrc function in the path-rc.sh script
+
+**Enable path-rc**
+
+1) Source the path-rc.sh from your shell's rc file
 ```shell
 $ source $HOME/repos/path-rc/path-rc.sh
 ```
-3) Create .path-rc files in your directory structure to have environment variables, functions and aliases specific to the directory and children
+2) Create .path-rc files in your directory structure to have environment variables, functions and aliases specific to the directory and children
+
+3) Optianally create a .path-rc file in your home or root directory to unalias and unset aliases, functions and variables that you dont want available throughout.
 
 ## EXAMPLE
 
-.path-rc
-
-alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'<br/>
+~/some/path/.path-rc
+```shell
+alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'
 export TF_WORKSPACE=dev-kubernetes-cluster
+function hello() {
+    echo "hello"
+}
+```
+
+~/.path-rc
+```shell
+unalias git
+unset TF_WORKSPACE
+unset -f hello
+```
+
 
 ## Inspiration
 
