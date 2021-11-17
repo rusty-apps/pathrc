@@ -25,6 +25,15 @@ mod tests {
             path.display()
         );
     }
+    
+    #[test]
+    fn test_find_files() {
+        let dir = findrc::get_path().unwrap();
+        println!("The path is: {}", dir)
+        let mut find_rc = FindRC::new(dir);
+        find_rc.search_files();
+        find_rc.print_file_list();
+    }
 
     // #[test]
     // fn find_dot_path_rc_file() -> Result<(), Box<dyn std::error::Error>> {

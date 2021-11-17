@@ -8,20 +8,23 @@ pub fn get_path() -> std::io::Result<PathBuf> {
     Ok(path)
 }
 
-pub struct FindRC<'dir> {
-    directory: &'dir PathBuf,
+pub struct FindRC {
+    //<'dir> {
+    //directory: &'dir PathBuf,
+    directory: PathBuf,
     found_files: Vec<String>,
 }
 
-impl<'dir> FindRC<'dir> {
-    pub fn new(directory: &'dir PathBuf) -> Self {
+// impl<'dir> FindRC<'dir> {
+impl FindRC {
+    pub fn new(directory: PathBuf) -> Self {
         Self {
             directory,
             found_files: Vec::new(),
         }
     }
 
-    pub fn search_files(&self) {
+    pub fn search_files(&mut self) {
         while let Some(path_buf) = Self::find_pathrc(&self) {
             let p_dir = Self::next_dir(path_buf.as_path());
             if p_dir == None {
@@ -43,7 +46,8 @@ impl<'dir> FindRC<'dir> {
     }
 
     fn find_pathrc(&self) -> Option<PathBuf> {
-        let mut path: PathBuf = self.directory.into();
+        let dir_path = self.directory.as_path();
+        let mut path: PathBuf = dir_path.into();
         let file = Path::new(PATHRC_FILENAME);
 
         loop {
@@ -60,7 +64,7 @@ impl<'dir> FindRC<'dir> {
             }
         }
     }
-    pub fn print_file_list(&self) {
+    pub fn print_file_list(&mut self) {
         while let Some(top) = self.found_files.pop() {
             println!("{}", top);
         }
