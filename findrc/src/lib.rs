@@ -9,19 +9,20 @@ pub fn get_path() -> std::io::Result<PathBuf> {
 }
 
 pub struct FindRC {
-    //<'dir> {
-    //directory: &'dir PathBuf,
     directory: PathBuf,
     found_files: Vec<String>,
 }
 
-// impl<'dir> FindRC<'dir> {
 impl FindRC {
     pub fn new(directory: PathBuf) -> Self {
         Self {
             directory,
             found_files: Vec::new(),
         }
+    }
+
+    pub fn found_files(&self) -> &Vec<String> {
+        &self.found_files
     }
 
     pub fn search_files(&mut self) {
