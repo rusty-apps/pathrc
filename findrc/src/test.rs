@@ -1,8 +1,9 @@
-mod main;
+use std::env;
+use std::path::PathBuf;
 
-// use std::env;
-// use std::path::{Path, PathBuf};
-use std::path::Path;
+use findrc::FindRC;
+
+mod findrc;
 
 const PATHRC_FILENAME: &str = ".path-rc";
 
@@ -14,17 +15,16 @@ mod tests {
     // }
 
     #[test]
-    
-
     fn test_get_path() {
         //let dir = Path::new("path-rc-file/test");
         // assert!(env::set_current_dir(&dir).is_ok());
 
         let path = get_path().unwrap();
-        println!("Successfully changed working directory to {}!", path.display());
+        println!(
+            "Successfully changed working directory to {}!",
+            path.display()
+        );
     }
-
-
 
     // #[test]
     // fn find_dot_path_rc_file() -> Result<(), Box<dyn std::error::Error>> {
@@ -32,7 +32,7 @@ mod tests {
     //     let dir = Path::new("path-rc-file/test");
     //     assert!(env::set_current_dir(&dir).is_ok());
     //     println!("Successfully changed working directory to {}!", dir.display());
-        
+
     //     let mut file = NamedTempFile::new()?;
     //     writeln!(file, "A test\nActual content\nMore content\nAnother test")?;
 
