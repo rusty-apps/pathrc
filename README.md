@@ -28,7 +28,7 @@ cargo build --release
 ```
 
 3. copy the target/release/findrc binary somewhere into your path
-
+   NOTE: this can be anywhere on your path, there are no external dependencies.
 ```shell
 cp target/release/findrc /usr/local/bin
 ```
@@ -51,7 +51,10 @@ $ source $HOME/repos/path-rc/path-rc.sh
 
 ```shell
 # Directory scoped aliases, env variables and functions.
-alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'
+# To change github ssh keys for different projects
+# alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'
+# You can even change the username and email.
+alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github" user.name="Tim Preece" user-email="74015979+tpreecesh@users.noreply.github.com"'
 AWS_PROFILE="me-at-work"
 export TF_WORKSPACE=dev-kubernetes-cluster
 function hello() {
