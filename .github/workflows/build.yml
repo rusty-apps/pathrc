@@ -4,44 +4,50 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: ["*"]
 
 env:
   CARGO_TERM_COLOR: always
+  BINARY_NAME: findrc
 
 jobs:
-  # build:
   build-linux:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
-        target: [x86_64-unknown-linux-musl]
-
-      max-parallel: 1
-    env:
-      BINARY_NAME: findrc
-      CARGO_TERM_COLOR: always
+        target: [x86_64-unknown-linux-musl, x86_64-unknown-linux-gnu]
+      max-parallel: 2
     steps:
       - uses: actions/checkout@v2
 
       - uses: shogan/rust-musl-action@master
         with:
           args: cargo build --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+
+      - name: Move release
+        if: github.event_name == 'push'
+        run: |
+          sudo chown -R $USER:$USER ${{ github.workspace }}
+          mkdir releases
+          mv findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
+
       - uses: actions/upload-artifact@v2
+        if: github.event_name == 'push'
         with:
-          name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
-          path: findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}
+          name: releases
+          path: releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
 
   build-macos:
     runs-on: macos-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         # target: [x86_64-apple-darwin, aarch64-apple-darwin]
         target: [x86_64-apple-darwin]
       max-parallel: 1
-    env:
-      BINARY_NAME: findrc
-      CARGO_TERM_COLOR: always
     steps:
       - uses: actions/checkout@v2
 
@@ -52,8 +58,45 @@ jobs:
         with:
           command: build
           args: --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+
+      - name: Move release
+        if: github.event_name == 'push'
+        run: |
+          mkdir releases
+          mv findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
+
       - uses: actions/upload-artifact@v2
+        if: github.event_name == 'push'
         with:
-          name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
-          path: findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}
-      
+          name: releases
+          path: releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
+
+  build-release:
+    if: github.event_name == 'push'
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: releases
+          path: release-artifacts
+
+      - run: ls -R
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "release-artifacts/*"
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          token: ${{ secrets.GITHUB_TOKEN }}
