@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # build:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-musl]
+
+      max-parallel: 1
+    env:
+      BINARY_NAME: findrc
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: shogan/rust-musl-action@master
+        with:
+          args: cargo build --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
+          path: findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        # target: [x86_64-apple-darwin, aarch64-apple-darwin]
+        target: [x86_64-apple-darwin]
+      max-parallel: 1
+    env:
+      BINARY_NAME: findrc
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BINARY_NAME }}-${{ matrix.target }}
+          path: findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}
+      
