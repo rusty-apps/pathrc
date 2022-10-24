@@ -2,13 +2,11 @@
 
 ### Shell environment variables, aliases and functions determined by path.
 
-The findrc binary is written in rust so is memory safe and blazingly fast!
-
-The accompanying shell script is written to be bourne shell compliemt so should work sith any variant, bash, zsh ...
+The pathrc binary is written in rust so is memory safe and blazingly fast!
 
 Currently at present there are no pre-built binaries so you need to build yourself.
 
-NOTE: to build the findrc binary you will need rust installed: [Rust Getting Started](https://www.rust-lang.org/learn/get-started).
+NOTE: to build the pathrc binary you will need rust installed: [Rust Getting Started](https://www.rust-lang.org/learn/get-started).
 
 ### Usage
 
@@ -18,27 +16,28 @@ NOTE: to build the findrc binary you will need rust installed: [Rust Getting Sta
 $ git clone https://github.com/tpreecesh/path-rc.git
 ```
 
-**Enable findrc**
+**Enable pathrc**
 
 1. Build the binary:
 
 ```shell
-cd path-rc/findrc
+cd path-rc/pathrc
 cargo build --release
 ```
 
-3. copy the target/release/findrc binary somewhere into your path
+3. copy the target/release/pathrc binary somewhere into your path
    NOTE: this can be anywhere on your path, there are no external dependencies.
+
 ```shell
-cp target/release/findrc /usr/local/bin
+cp target/release/pathrc /usr/local/bin
 ```
 
 **Enable path-rc**
 
-1. Source the path-rc.sh from your shell's rc file
+1. Source the pathrc from your shell's rc file
 
 ```shell
-$ source $HOME/repos/path-rc/path-rc.sh
+eval  "$(pathrc)"
 ```
 
 2. Create .path-rc files in your directory structure to have environment variables, functions and aliases specific to the directory and children. Findrc searches for the .path-rc files by cascading up the directory structure and then the discovered files are sourced in a downward sequence to the current directory.
@@ -73,6 +72,12 @@ unset -f hello
 # Add global defaults
 AWS_PROFILE="me-at-home"
 ```
+
+## Optional findrc
+
+findrc is a utility to locate all the .path-rc files sourced for a given path
+
+Build as per pathrc but from the findrc repository and copy it to somewhere in your path
 
 ## Inspiration
 
