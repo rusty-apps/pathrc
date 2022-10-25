@@ -1,4 +1,5 @@
-use std::fs;
+// use std::fs;
+// use std::io::{self, BufReader};
 use std::path::{Path, PathBuf};
 use std::{env, str};
 
@@ -66,15 +67,83 @@ impl PathRC {
             }
         }
     }
-    pub fn consolidate_aliases(&mut self) {
+    pub fn consolidate_aliases(&mut self) -> std::io::Result<()> {
         while let Some(top) = self.found_files.pop() {
-            // println!("{}", top);
-            // Catch and ignore unalias when it is not set
-            // get list of aliases
-            // get list of unaliases
+            // rewrite unalias to format : alias | grep -q git && unalias git
+            // let file = fs::File::open(top);
+            // let reader = BufReader::new(file);
 
-            let contents = fs::read_to_string(top).expect("Should have been able to read the file");
-            println!("\n{contents}");
+            for line in my_reader::BufReader::open(top)? {
+                // match line.chars().next() {
+                //     Some('unalias') =>
+                // }
+
+                println!("\n{}", line?.trim());
+            }
+
+            // for line in reader.lines() {
+            //     println!("\n{}", line);
+            // }
+
+            // let contents = fs::read_to_string(top).expect("Should have been able to read the file");
+            // println!("\n{contents}");
+        }
+
+        Ok(())
+    }
+}
+
+mod my_reader {
+    use std::{
+        fs::File,
+        io::{self, prelude::*},
+        rc::Rc,
+    };
+
+    pub struct BufReader {
+        reader: io::BufReader<File>,
+        buf: Rc<String>,
+    }
+
+    fn new_buf() -> Rc<String> {
+        Rc::new(String::with_capacity(1024)) // Tweakable capacity
+    }
+
+    impl BufReader {
+        pub fn open(path: impl AsRef<std::path::Path>) -> io::Result<Self> {
+            let file = File::open(path)?;
+            let reader = io::BufReader::new(file);
+            let buf = new_buf();
+
+            Ok(Self { reader, buf })
+        }
+    }
+
+    impl Iterator for BufReader {
+        type Item = io::Result<Rc<String>>;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            let buf = match Rc::get_mut(&mut self.buf) {
+                Some(buf) => {
+                    buf.clear();
+                    buf
+                }
+                None => {
+                    self.buf = new_buf();
+                    Rc::make_mut(&mut self.buf)
+                }
+            };
+
+            self.reader
+                .read_line(buf)
+                .map(|u| {
+                    if u == 0 {
+                        None
+                    } else {
+                        Some(Rc::clone(&self.buf))
+                    }
+                })
+                .transpose()
         }
     }
 }
