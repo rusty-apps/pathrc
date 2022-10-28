@@ -8,7 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  BINARY_NAME: findrc
+  BINARY_NAME: pathrc
 
 jobs:
   build-linux:
@@ -24,14 +24,14 @@ jobs:
 
       - uses: shogan/rust-musl-action@master
         with:
-          args: cargo build --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+          args: cargo build --target ${{ matrix.target }} --release --manifest-path=pathrc/Cargo.toml
 
       - name: Move release
         if: github.event_name == 'push'
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }}
           mkdir releases
-          mv findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
+          mv pathrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
 
       - uses: actions/upload-artifact@v2
         if: github.event_name == 'push'
@@ -57,13 +57,13 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --target ${{ matrix.target }} --release --manifest-path=findrc/Cargo.toml
+          args: --target ${{ matrix.target }} --release --manifest-path=pathrc/Cargo.toml
 
       - name: Move release
         if: github.event_name == 'push'
         run: |
           mkdir releases
-          mv findrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
+          mv pathrc/target/${{ matrix.target }}/release/${{ env.BINARY_NAME }} releases/${{ env.BINARY_NAME }}-${{ matrix.target }}
 
       - uses: actions/upload-artifact@v2
         if: github.event_name == 'push'
