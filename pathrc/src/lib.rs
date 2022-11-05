@@ -1,3 +1,5 @@
+use command::Command;
+use command::CommandIgnore;
 // use std::fs;
 // use std::io::{self, BufReader};
 use std::path::{Path, PathBuf};
@@ -74,6 +76,12 @@ impl PathRC {
             // let reader = BufReader::new(file);
 
             for line in my_reader::BufReader::open(top)? {
+                let words:Vec = vec!(line.split(" ").collect());
+                match Some(words[0]) {
+                    Some("unalias") => format("alias | grep -q {} && unalias {}", words[0], words[0]),
+                    None => line,
+                    }
+                }
                 // match line.chars().next() {
                 //     Some('unalias') =>
                 // }
