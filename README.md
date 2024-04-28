@@ -1,81 +1,99 @@
-# path-rc
+# PATHRC:
 
-### Shell environment variables, aliases and functions determined by path.
+## Command line utility to provide per path configurations for aliases, environment variables and functions.
 
-The findrc binary is written in rust so is memory safe and blazingly fast!
+## Currently supported shells:
+* `Bash`
+* `Zsh`
+* `Fish`(Experimental)
 
-The accompanying shell script is written to be bourne shell compliemt so should work sith any variant, bash, zsh ...
+*Other untested bourne shell deviates including the `Bourne` shell may also work if forced to run as `Bash`.* 
 
-Currently at present there are no pre-built binaries so you need to build yourself.
+## Installation
 
-NOTE: to build the findrc binary you will need rust installed: [Rust Getting Started](https://www.rust-lang.org/learn/get-started).
+There is currently no automated method to install but hopefully this will be implemented soon. 
 
-### Usage
+The currently recommended installation process is:
 
-**Clone the repository onto your local system**
+1) Manually download a release from https://github.com/rusty-apps/pathrc/releases
+2) Validate the release against it checksums
+3) Move the binary into /usr/local/bin
+4) chmod +x /usr/local/bin/pathrc 
 
-```shell
-$ git clone https://github.com/tpreecesh/path-rc.git
+## TLDR;
+
+Add 
+```
+eval "$(pathrc init)"
 ```
 
-**Enable findrc**
+to your shell init file:
 
-1. Build the binary:
+By default, pathrc rc files should be named according to the shell:
 
-```shell
-cd path-rc/findrc
-cargo build --release
+* Under `Bash` pathrc searches for files named `.pathrc.bash`
+* Under`Zsh` pathrc searches for files named `.pathrc.zsh`
+* Under`Fish` pathrc searches for files named `.pathrc.fish`
+
+During initialisation shells with a reasonable level of compatibility i.e. `Bash` and `Zsh` can use the same files by 
+enabling shared config, see usage below. When shared config is enabled both `Bash` and `Zsh` will use `.pathrc.sh`.
+
+The number of directories travelled up can be configured by the PATHRC_DEPTH environment variable, see environment 
+variables below. 
+
+## Commands:
+
+### Init
+There are three commands the most important of which is `init` which initialises the shell to use pathrc. By default, 
+without any arguments `init` will try to determine the shell from the SHELL environment variable. In some cases there 
+may be a need to explicitly specify the shell, i.e. if the SHELL environment is missing or in an unrecognised format.
+Being able to override the shell might also be useful for running under different but compatible shells i.e. specifying 
+bash with the `Bourne` shell. NOTE this is completely untested!
+
+### Collate
+This is the engine that collates all the pathrc configuration files which get evaluated into the shell when changing 
+directory.
+
+### List
+This is a useful utility for identifying the pathrc configuration files that will be processed at the current directory.
+
+
+## Usage  
+
+`pathrc` itself has the usual flags for help `-h` and version `-V`.
+
+`list` and `collate` have no further options.
+
+`init` takes an optional `shell` argument with `env` being the default which tried to fetch the current shell from the 
+environment. In addition `init` can also take an optional flag `-s` to enable shared configuration and should be 
+configured in the shell's init file as 
+```
+eval "$(pathrc init -s)"
+```
+or to force a shell i.e. bash
+```
+eval "$(pathrc init bash -s)"
 ```
 
-3. copy the target/release/findrc binary somewhere into your path
-   NOTE: this can be anywhere on your path, there are no external dependencies.
-```shell
-cp target/release/findrc /usr/local/bin
-```
+## Environment variables
 
-**Enable path-rc**
+### PATHRC_DEPTH
+This optional environment variable overrides the maximum directory
+descent when searching for configuration files.
 
-1. Source the path-rc.sh from your shell's rc file
+The default depth is set 1000.
 
-```shell
-$ source $HOME/repos/path-rc/path-rc.sh
-```
+### PATHRC_SHARED_CONFIG
 
-2. Create .path-rc files in your directory structure to have environment variables, functions and aliases specific to the directory and children. Findrc searches for the .path-rc files by cascading up the directory structure and then the discovered files are sourced in a downward sequence to the current directory.
+This optional environment variable can be set to TRUE or FALSE
+and changes the of how the bourne shell derivatives `Bash` and `Zsh` config files are named.
+The default is TRUE and causes `pathrc` to read .pathrc.sh config files for both shells.
+If set to FALSE then the config files are not shared, instead `pathrc` reads .pathrc.bash and .pathrc.zsh accordingly.
 
-3. Optianally create a .path-rc file in your home or root directory to unset aliases, functions and variables that go out of scope and to set global defaults.
+PATHRC_SHELL
 
-## EXAMPLE
+### PATHRC_SHELL
+This environment variable is dynamically set when the shell init file or the file that configures pathrc is invoked. 
 
-~/some/path/.path-rc
-
-```shell
-# Directory scoped aliases, env variables and functions.
-# To change github ssh keys for different projects
-# alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github"'
-# You can even change the username and email.
-alias git='git -c core.sshCommand="ssh -i ~/.ssh/id_github" -c user.name="Tim Preece" -c user.email="74015979+tpreecesh@users.noreply.github.com"'
-AWS_PROFILE="me-at-work"
-export TF_WORKSPACE=dev-kubernetes-cluster
-function hello() {
-    echo "hello"
-}
-```
-
-~/.path-rc
-
-```shell
-# Remove out of scope aliases, env variables and functions
-alias | grep -q git && unalias git
-unset TF_WORKSPACE
-unset -f hello
-
-# Add global defaults
-AWS_PROFILE="me-at-home"
-```
-
-## Inspiration
-
-ASDF: https://github.com/asdf-vm/asdf
-
-Stack Exchange: https://unix.stackexchange.com/questions/6463/find-searching-in-parent-directories-instead-of-subdirectories
+The value of the variable is set to the name of the shell so not to rely on the SHELL environment variable that maybe 
+missing or different in some systems.
